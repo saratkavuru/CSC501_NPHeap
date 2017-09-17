@@ -43,23 +43,67 @@
 #include <linux/poll.h>
 #include <linux/mutex.h>
 
+
 // If exist, return the data.
+extern struct list;
+extern struct list *head;
 long npheap_lock(struct npheap_cmd __user *user_cmd)
 {
+    struct list *temp=head;
+    while(temp!=NULL)
+    {
+	if(temp->offset==(user_cmd->offset))
+        {
+            mutex_lock(temp->lock);
+            return 0;
+        }
+        temp=temp->next;
+    }
     return 0;
 }     
 
 long npheap_unlock(struct npheap_cmd __user *user_cmd)
 {
+    struct list *temp=head;
+    while(temp!=NULL)
+    {
+        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
+        {
+            mutex_unlock(temp->lock);
+            return 0;
+        }
+        temp=temp->next;
+    }
     return 0;
 }
 
 long npheap_getsize(struct npheap_cmd __user *user_cmd)
 {
+    struct list *temp=head;
+    while(temp!=NULL)
+    {
+        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
+            return temp->size;
+        temp=temp->next;
+    }
     return 0;
 }
 long npheap_delete(struct npheap_cmd __user *user_cmd)
 {
+    struct list *temp=head;
+    while(temp!=NULL)
+    {
+        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
+        {
+            if(!mutex_is_locked(temp->lock))
+            {
+                kfree(temp->addr);
+                temp->addr=NULL;
+                return 0;
+            }
+        }
+        temp=temp->next;
+    }
     return 0;
 }
 
@@ -79,3 +123,4 @@ long npheap_ioctl(struct file *filp, unsigned int cmd,
         return -ENOTTY;
     }
 }
+

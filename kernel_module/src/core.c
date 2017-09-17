@@ -45,9 +45,44 @@
 
 extern struct miscdevice npheap_dev;
 
+struct list{
+    __u64 offset;
+    void* addr;
+    unsigned long size;
+   // struct mutex *lock;
+    struct list *next;
+};
+struct list *head=NULL;
+
+
 int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-    return 0;
+    	struct list *temp=head;
+   	while(temp!=NULL)
+    	{
+        	if(temp->offset==(vma->vm_pgoff<<PAGE_SHIFT))
+        	{    
+           		return temp->addr;
+        	}
+        temp=temp->next;
+    	}
+	void* kernel_memory = kmalloc(vma->vm_end - vma->vm_start, GFP_KERNEL);
+    	if(!remap_pfn_range(vma,virt_to_phys(kernel_memory), vma->vm_pgoff,vma->vm_end-vma->vm_start, vma->vm_page_prot))
+		printk(KERN_CONT "successfuly allocated kernel memory\n");
+	struct list *new_mapping=kmalloc(sizeof(struct list),GFP_KERNEL);
+        new_mapping->addr=kernel_memory;
+       	new_mapping->offset = vma->vm_pgoff<<PAGE_SHIFT;
+   	new_mapping->size = vma->vm_end - vma->vm_start;
+       	new_mapping->next=NULL;
+    	if(temp==NULL)
+   	     head=new_mapping;
+    	else
+        {
+    		while(temp->next!=NULL)
+        	temp=temp->next;
+        	temp->next=new_mapping;
+        }
+    return new_mapping->addr;
 }
 
 int npheap_init(void)

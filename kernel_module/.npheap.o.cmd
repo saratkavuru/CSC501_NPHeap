@@ -1,0 +1,1 @@
+cmd_/home/rthiran/CSC501_NPHeap/kernel_module/npheap.o := ld -m elf_x86_64   -r -o /home/rthiran/CSC501_NPHeap/kernel_module/npheap.o /home/rthiran/CSC501_NPHeap/kernel_module/src/core.o /home/rthiran/CSC501_NPHeap/kernel_module/src/ioctl.o /home/rthiran/CSC501_NPHeap/kernel_module/interface.o 
