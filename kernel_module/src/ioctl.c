@@ -45,26 +45,34 @@
 
 
 // If exist, return the data.
-extern struct list;
-extern struct list *head;
+ //extern struct list;
+struct list{
+    __u64 offset;
+    void* addr;
+    unsigned long size;
+    struct mutex *lock;
+    struct list *next;
+};
+
+ extern struct list *head;
 long npheap_lock(struct npheap_cmd __user *user_cmd)
 {
-    struct list *temp=head;
-    while(temp!=NULL)
-    {
-	if(temp->offset==(user_cmd->offset))
-        {
-            mutex_lock(temp->lock);
-            return 0;
-        }
-        temp=temp->next;
-    }
-    return 0;
+ //    struct list *temp = head;
+ //    while(temp!=NULL)
+ //    {
+	// if(temp->offset==(user_cmd->offset))
+ //        {
+ //            mutex_lock(temp->lock);
+ //            return 0;
+ //        }
+ //        temp=temp->next;
+ //    }
+ //    return 0;
 }     
 
 long npheap_unlock(struct npheap_cmd __user *user_cmd)
 {
-    struct list *temp=head;
+    /*struct list *temp=head;
     while(temp!=NULL)
     {
         if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
@@ -73,24 +81,24 @@ long npheap_unlock(struct npheap_cmd __user *user_cmd)
             return 0;
         }
         temp=temp->next;
-    }
+    }*/
     return 0;
 }
 
 long npheap_getsize(struct npheap_cmd __user *user_cmd)
 {
-    struct list *temp=head;
+    /*struct list *temp=head;
     while(temp!=NULL)
     {
         if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
             return temp->size;
         temp=temp->next;
-    }
+    }*/
     return 0;
 }
 long npheap_delete(struct npheap_cmd __user *user_cmd)
 {
-    struct list *temp=head;
+    /*struct list *temp=head;
     while(temp!=NULL)
     {
         if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
@@ -103,7 +111,7 @@ long npheap_delete(struct npheap_cmd __user *user_cmd)
             }
         }
         temp=temp->next;
-    }
+    }*/
     return 0;
 }
 

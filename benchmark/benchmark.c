@@ -45,9 +45,9 @@ int main(int argc, char *argv[])
     }
     sprintf(filename,"npheap.%d.log",(int)getpid());
     fp = fopen(filename,"w");
-    for(i = 0; i < number_of_objects; i++)
+for(i = 0; i < number_of_objects; i++)
     {
-        npheap_lock(devfd,i);
+       //npheap_lock(devfd,i);
         do 
         {
             size = rand() % max_size_of_objects;
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
             sprintf(mapped_data,"%s%d",mapped_data,a);
         }
         fprintf(fp,"S\t%d\t%ld\t%d\t%lu\t%s\n",pid,current_time.tv_sec * 1000000 + current_time.tv_usec,i,strlen(mapped_data),mapped_data);
-        npheap_unlock(devfd,i);
+       // npheap_unlock(devfd,i);
     }
 /*    
     // try delete something
