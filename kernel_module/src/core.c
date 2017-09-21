@@ -64,19 +64,22 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
             printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff>>PAGE_SHIFT, temp->offset);
             // printk(KERN_CONT "hi %lu \n",temp->offset);
         	if(temp->offset==(vma->vm_pgoff>>PAGE_SHIFT))
-        	{   printk(KERN_CONT "offset found"); 
+        	{   printk(KERN_CONT "offset found\n"); 
            		 return 0;
         	}
 
-        temp=temp->next;
+         temp=temp->next;
          printk(KERN_CONT "inside while");
     	}
 
         printk(KERN_CONT "line 72\n");
 	void* kernel_memory = kmalloc(vma->vm_end - vma->vm_start, GFP_KERNEL);
         printk(KERN_CONT "line 73\n");
-    	if(!remap_pfn_range(vma,vma->vm_start,virt_to_phys(kernel_memory),vma->vm_end-vma->vm_start, vma->vm_page_prot))
-		printk(KERN_CONT "successfuly allocated kernel memory %ul \n",kernel_memory);
+        phys_addr_t kernel_phys_addr = __pa(kernel_memory);
+    	//if(!remap_pfn_range(vma,vma->vm_start,kernel_phys_addr >> PAGE_SHIFT,vma->vm_end-vma->vm_start, vma->vm_page_prot))
+        if(!remap_pfn_range(vma,vma->vm_start,virt_to_phys(kernel_memory),vma->vm_end-vma->vm_start, vma->vm_page_prot))
+           printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,virt_to_phys(kernel_memory));
+		//printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,kernel_phys_addr >> PAGE_SHIFT);
 	struct list *new_mapping=kmalloc(sizeof(struct list),GFP_KERNEL);
         new_mapping->addr=kernel_memory;
        	new_mapping->offset = vma->vm_pgoff>>PAGE_SHIFT;
