@@ -103,8 +103,8 @@ long npheap_getsize(struct npheap_cmd __user *user_cmd)
 {
 	struct list *temp=head;
     while(temp!=NULL)
-    {
-        if(temp->offset==(user_cmd->offset))
+    {print
+        if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
 		return temp->size;
 	}

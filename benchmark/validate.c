@@ -85,5 +85,6 @@ int main(int argc, char *argv[])
     if(error == 0)
         fprintf(stderr,"Pass\n");
     close(devfd);
+    printf("Errrors are %d",error);
     return 0;
 }
