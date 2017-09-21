@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     printf("Line 49\n");
 for(i = 0; i < number_of_objects; i++)
     {
-       //npheap_lock(devfd,i);
+        npheap_lock(devfd,i);
         do 
         {
             size = rand() % max_size_of_objects;
@@ -72,16 +72,16 @@ for(i = 0; i < number_of_objects; i++)
         }
         printf("Line 73\n");
         fprintf(fp,"S\t%d\t%ld\t%d\t%lu\t%s\n",pid,current_time.tv_sec * 1000000 + current_time.tv_usec,i,strlen(mapped_data),mapped_data);
-       // npheap_unlock(devfd,i);
+        npheap_unlock(devfd,i);
         printf("Line 76\n");
     }
-/*    
+    
     // try delete something
     i = rand()%256;
     npheap_lock(devfd,i);
     npheap_delete(devfd,i);
     fprintf(fp,"D\t%d\t%ld\t%d\t%lu\t%s\n",pid,current_time.tv_sec * 1000000 + current_time.tv_usec,i,strlen(mapped_data),mapped_data);
-    npheap_unlock(devfd,i);*/
+    npheap_unlock(devfd,i);
     close(devfd);
     printf("Line 86\n");
     if(pid != 0)

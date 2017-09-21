@@ -50,68 +50,71 @@ struct list{
     __u64 offset;
     void* addr;
     unsigned long size;
-    struct mutex *lock;
+    struct mutex lock;
     struct list *next;
 };
+
+DEFINE_MUTEX(global_lock);
 
  extern struct list *head;
 long npheap_lock(struct npheap_cmd __user *user_cmd)
 {
- //    struct list *temp = head;
- //    while(temp!=NULL)
- //    {
-	// if(temp->offset==(user_cmd->offset))
- //        {
- //            mutex_lock(temp->lock);
- //            return 0;
- //        }
- //        temp=temp->next;
- //    }
- //    return 0;
+    struct npheap_cmd = temp;
+    if(!copy_from_user(&temp,(void __user *) user_cmd,sizeof(struct npheap_cmd)));
+     struct list *temp = head;
+     while(temp!=NULL)
+            {
+	 if(temp->offset==(user_cmd->offset))
+        {
+             mutex_lock(&lock);
+              printk(KERN_CONT "LOCKED\n");
+             return 0;
+         }
+         temp=temp->next;
+     }
+     return 0;
 }     
 
 long npheap_unlock(struct npheap_cmd __user *user_cmd)
 {
-    /*struct list *temp=head;
+    struct list *temp=head;
+    printk(KERN_CONT "IN UNLOCK\n");
     while(temp!=NULL)
-    {
-        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
-        {
-            mutex_unlock(temp->lock);
+    { printk(KERN_CONT "IN WHILE\n");
+        if(temp->offset==(user_cmd->offset))
+        {printk(KERN_CONT "IN IF\n");
+            mutex_unlock(&lock);
+             printk(KERN_CONT "UNLOCK\n");
             return 0;
         }
         temp=temp->next;
-    }*/
+    }
     return 0;
 }
 
 long npheap_getsize(struct npheap_cmd __user *user_cmd)
 {
-    /*struct list *temp=head;
-    while(temp!=NULL)
-    {
-        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
-            return temp->size;
-        temp=temp->next;
-    }*/
-    return 0;
+   return user_cmd->size;
 }
+
 long npheap_delete(struct npheap_cmd __user *user_cmd)
 {
-    /*struct list *temp=head;
+    struct list *temp=head;
     while(temp!=NULL)
     {
-        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
+        if(temp->offset==(user_cmd->offset))
         {
-            if(!mutex_is_locked(temp->lock))
+             printk(KERN_CONT "inside delete\n");
+            if(!mutex_is_locked(&lock))
             {
                 kfree(temp->addr);
                 temp->addr=NULL;
+                temp->offset=-1;
                 return 0;
             }
         }
         temp=temp->next;
-    }*/
+    }
     return 0;
 }
 
