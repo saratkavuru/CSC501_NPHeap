@@ -87,6 +87,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
         new_mapping->addr=kernel_memory;
        	new_mapping->offset = vma->vm_pgoff;
    	new_mapping->size = vma->vm_end - vma->vm_start;
+	mutex_unlock(&new_mapping->lock);
        	new_mapping->next=NULL;
         temp = head;
     	if(temp==NULL)

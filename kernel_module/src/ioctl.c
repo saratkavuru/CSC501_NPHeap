@@ -59,14 +59,17 @@ DEFINE_MUTEX(global_lock);
  extern struct list *head;
 long npheap_lock(struct npheap_cmd __user *user_cmd)
 {
-    struct npheap_cmd = temp;
-    if(!copy_from_user(&temp,(void __user *) user_cmd,sizeof(struct npheap_cmd)));
+    //struct npheap_cmd = temp;
+    //if(!copy_from_user(&temp,(void __user *) user_cmd,sizeof(struct npheap_cmd)))
+
      struct list *temp = head;
      while(temp!=NULL)
             {
 	 if(temp->offset==(user_cmd->offset))
         {
-             mutex_lock(&lock);
+             mutex_lock(&global_lock);
+		mutex_lock(&temp->lock);
+	mutex_lock(&global_lock);
               printk(KERN_CONT "LOCKED\n");
              return 0;
          }
@@ -83,7 +86,8 @@ long npheap_unlock(struct npheap_cmd __user *user_cmd)
     { printk(KERN_CONT "IN WHILE\n");
         if(temp->offset==(user_cmd->offset))
         {printk(KERN_CONT "IN IF\n");
-            mutex_unlock(&lock);
+            mutex_unlock(&global_lock);
+		mutex_unlock(&temp->lock);
              printk(KERN_CONT "UNLOCK\n");
             return 0;
         }
@@ -94,7 +98,16 @@ long npheap_unlock(struct npheap_cmd __user *user_cmd)
 
 long npheap_getsize(struct npheap_cmd __user *user_cmd)
 {
-   return user_cmd->size;
+	struct list *temp=head;
+    while(temp!=NULL)
+    {
+        if(temp->offset==(user_cmd->offset))
+        {
+		return temp->size;
+	}
+	temp=temp->next;
+     }
+   return 0;
 }
 
 long npheap_delete(struct npheap_cmd __user *user_cmd)
@@ -105,7 +118,7 @@ long npheap_delete(struct npheap_cmd __user *user_cmd)
         if(temp->offset==(user_cmd->offset))
         {
              printk(KERN_CONT "inside delete\n");
-            if(!mutex_is_locked(&lock))
+            if(!mutex_is_locked(&global_lock))
             {
                 kfree(temp->addr);
                 temp->addr=NULL;
