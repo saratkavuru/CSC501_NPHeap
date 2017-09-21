@@ -61,7 +61,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
     //printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff>>PAGE_SHIFT, temp->offset);
    	while(temp!=NULL)
     	{
-            printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff>>PAGE_SHIFT, temp->offset);
+            printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff, temp->offset);
             // printk(KERN_CONT "hi %lu \n",temp->offset);
         	if(temp->offset==(vma->vm_pgoff))
         	{   printk(KERN_CONT "offset found\n");
@@ -71,7 +71,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
         	}
 
          temp=temp->next;
-         printk(KERN_CONT "inside while\n");
+        
     	}
 
         printk(KERN_CONT "line 72\n");
@@ -87,7 +87,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
         new_mapping->addr=kernel_memory;
        	new_mapping->offset = vma->vm_pgoff;
    	new_mapping->size = vma->vm_end - vma->vm_start;
-	mutex_unlock(&new_mapping->lock);
+	//mutex_unlock(&new_mapping->lock);
        	new_mapping->next=NULL;
         temp = head;
     	if(temp==NULL)

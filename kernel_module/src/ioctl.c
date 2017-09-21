@@ -65,12 +65,14 @@ long npheap_lock(struct npheap_cmd __user *user_cmd)
      struct list *temp = head;
      while(temp!=NULL)
             {
-	 if(temp->offset==(user_cmd->offset))
+	 if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
              mutex_lock(&global_lock);
+             printk(KERN_CONT "GLOBAL LOCKED\n");
 		mutex_lock(&temp->lock);
-	mutex_lock(&global_lock);
-              printk(KERN_CONT "LOCKED\n");
+        printk(KERN_CONT "OBJECT LOCKED\n");
+	mutex_unlock(&global_lock);
+              printk(KERN_CONT "GLOBAL UNLOCKED\n");
              return 0;
          }
          temp=temp->next;
@@ -83,12 +85,13 @@ long npheap_unlock(struct npheap_cmd __user *user_cmd)
     struct list *temp=head;
     printk(KERN_CONT "IN UNLOCK\n");
     while(temp!=NULL)
-    { printk(KERN_CONT "IN WHILE\n");
-        if(temp->offset==(user_cmd->offset))
+    {
+         printk(KERN_CONT "The offsets are %lu %lu\n",temp->offset,user_cmd->offset/PAGE_SIZE);
+        if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {printk(KERN_CONT "IN IF\n");
             mutex_unlock(&global_lock);
 		mutex_unlock(&temp->lock);
-             printk(KERN_CONT "UNLOCK\n");
+        printk(KERN_CONT "OBJECT UNLOCKED\n");
             return 0;
         }
         temp=temp->next;
@@ -115,7 +118,7 @@ long npheap_delete(struct npheap_cmd __user *user_cmd)
     struct list *temp=head;
     while(temp!=NULL)
     {
-        if(temp->offset==(user_cmd->offset))
+        if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
              printk(KERN_CONT "inside delete\n");
             if(!mutex_is_locked(&global_lock))
@@ -123,6 +126,7 @@ long npheap_delete(struct npheap_cmd __user *user_cmd)
                 kfree(temp->addr);
                 temp->addr=NULL;
                 temp->offset=-1;
+                printk(KERN_CONT "OBJECT DELETED\n");
                 return 0;
             }
         }
