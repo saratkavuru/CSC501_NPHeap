@@ -103,7 +103,7 @@ long npheap_getsize(struct npheap_cmd __user *user_cmd)
 {
 	struct list *temp=head;
     while(temp!=NULL)
-    {print
+    {
         if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
 		return temp->size;
@@ -120,15 +120,15 @@ long npheap_delete(struct npheap_cmd __user *user_cmd)
     {
         if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
-             printk(KERN_CONT "inside delete\n");
-            if(!mutex_is_locked(&global_lock))
-            {
+             printk(KERN_CONT "inside delete %lu\n",temp->offset);
+            
+            
                 kfree(temp->addr);
-                temp->addr=NULL;
-                temp->offset=-1;
+                //temp->addr=NULL;
+                //temp->offset=-1;
                 printk(KERN_CONT "OBJECT DELETED\n");
                 return 0;
-            }
+            
         }
         temp=temp->next;
     }
