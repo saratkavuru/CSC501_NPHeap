@@ -1,3 +1,4 @@
+// Project 1: Rachit Thirani, rthiran; Sarat Kavuru, skavuru;
 //////////////////////////////////////////////////////////////////////
 //                             North Carolina State University
 //
@@ -45,31 +46,53 @@
 
 
 // If exist, return the data.
-extern struct list;
-extern struct list *head;
+ //extern struct list;
+struct list{
+    __u64 offset;
+    void* addr;
+    unsigned long size;
+    struct mutex lock;
+    struct list *next;
+};
+
+DEFINE_MUTEX(global_lock);
+
+ extern struct list *head;
 long npheap_lock(struct npheap_cmd __user *user_cmd)
 {
-    struct list *temp=head;
-    while(temp!=NULL)
-    {
-	if(temp->offset==(user_cmd->offset))
+    //struct npheap_cmd = temp;
+    //if(!copy_from_user(&temp,(void __user *) user_cmd,sizeof(struct npheap_cmd)))
+
+     struct list *temp = head;
+     while(temp!=NULL)
+            {
+	 if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
-            mutex_lock(temp->lock);
-            return 0;
-        }
-        temp=temp->next;
-    }
-    return 0;
+             mutex_lock(&global_lock);
+             //printk(KERN_CONT "GLOBAL LOCKED\n");
+		mutex_lock(&temp->lock);
+        //printk(KERN_CONT "OBJECT LOCKED\n");
+	mutex_unlock(&global_lock);
+              //printk(KERN_CONT "GLOBAL UNLOCKED\n");
+             return 0;
+         }
+         temp=temp->next;
+     }
+     return 0;
 }     
 
 long npheap_unlock(struct npheap_cmd __user *user_cmd)
 {
     struct list *temp=head;
+    //printk(KERN_CONT "IN UNLOCK\n");
     while(temp!=NULL)
     {
-        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
-        {
-            mutex_unlock(temp->lock);
+        //printk(KERN_CONT "The offsets are %lu %lu\n",temp->offset,user_cmd->offset/PAGE_SIZE);
+        if(temp->offset==(user_cmd->offset/PAGE_SIZE))
+        {//printk(KERN_CONT "IN IF\n");
+            mutex_unlock(&global_lock);
+		mutex_unlock(&temp->lock);
+        //printk(KERN_CONT "OBJECT UNLOCKED\n");
             return 0;
         }
         temp=temp->next;
@@ -79,28 +102,34 @@ long npheap_unlock(struct npheap_cmd __user *user_cmd)
 
 long npheap_getsize(struct npheap_cmd __user *user_cmd)
 {
-    struct list *temp=head;
+	struct list *temp=head;
     while(temp!=NULL)
     {
-        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
-            return temp->size;
-        temp=temp->next;
-    }
-    return 0;
+        if(temp->offset==(user_cmd->offset/PAGE_SIZE))
+        {
+		return temp->size;
+	}
+	temp=temp->next;
+     }
+   return 0;
 }
+
 long npheap_delete(struct npheap_cmd __user *user_cmd)
 {
     struct list *temp=head;
     while(temp!=NULL)
     {
-        if(temp->offset==(user_cmd->offset<<PAGE_SHIFT))
+        if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
-            if(!mutex_is_locked(temp->lock))
-            {
+          //   printk(KERN_CONT "inside delete %lu\n",temp->offset);
+            
+            
                 kfree(temp->addr);
-                temp->addr=NULL;
+                //temp->addr=NULL;
+                //temp->offset=-1;
+               // printk(KERN_CONT "OBJECT DELETED\n");
                 return 0;
-            }
+            
         }
         temp=temp->next;
     }
