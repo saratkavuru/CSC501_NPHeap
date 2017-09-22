@@ -45,7 +45,7 @@
 #include <linux/mutex.h>
 
 extern struct miscdevice npheap_dev;
-
+//list ot keep a track of the objects
 struct list{
     __u64 offset;
     void* addr;
@@ -60,6 +60,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
 {
     	struct list *temp=head;
     //printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff>>PAGE_SHIFT, temp->offset);
+	//check if the offset exists
    	while(temp!=NULL)
     	{
            // printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff, temp->offset);
@@ -74,7 +75,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
          temp=temp->next;
         
     	}
-
+//if the offset is not present allocate kernel memory
        // printk(KERN_CONT "line 72\n");
 	void* kernel_memory = kmalloc(vma->vm_end - vma->vm_start, GFP_KERNEL);
         //printk(KERN_CONT "line 73\n");
