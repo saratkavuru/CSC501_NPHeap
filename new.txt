@@ -1,2 +1,2 @@
 Pass
-Errrors are 0
+Error Count: 0
