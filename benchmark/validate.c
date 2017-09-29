@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
         {
             mapped_data = (char *)npheap_alloc(devfd,i,npheap_getsize(devfd,i));
             if(strcmp(mapped_data,obj[i])!=0)
-            {    
-                  fprintf(stderr,"%s\n",obj[i]);
+
+            {
                  fprintf(stderr, "Object %d has a wrong value %s v.s. %s\n",i,mapped_data,obj[i]);
                  error++;
             }
