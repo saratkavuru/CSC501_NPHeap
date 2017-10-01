@@ -60,9 +60,11 @@ DEFINE_MUTEX(global_lock);
  extern struct list *head;
 long npheap_lock(struct npheap_cmd __user *user_cmd)
 {
-    //struct npheap_cmd = temp;
-    //if(!copy_from_user(&temp,(void __user *) user_cmd,sizeof(struct npheap_cmd)))
-
+    /*struct npheap_cmd  t;
+    if(!copy_from_user(&t,(void __user *) user_cmd,sizeof(struct npheap_cmd)))
+    {
+        printk(KERN_CONT "Data Copied\n");
+    }
      struct list *temp = head;
      while(temp!=NULL)
             {
@@ -73,24 +75,25 @@ long npheap_lock(struct npheap_cmd __user *user_cmd)
              //printk(KERN_CONT "GLOBAL LOCKED\n");
 		 //lock the object
 		mutex_lock(&temp->lock);
-        //printk(KERN_CONT "OBJECT LOCKED\n");
+       //printk(KERN_CONT "OBJECT LOCKED\n");
 		 //global unlock
 	mutex_unlock(&global_lock);
               //printk(KERN_CONT "GLOBAL UNLOCKED\n");
              return 0;
          }
          temp=temp->next;
-     }
+     }*/
+    mutex_lock(&global_lock);
      return 0;
 }     
 
 long npheap_unlock(struct npheap_cmd __user *user_cmd)
 {
-    struct list *temp=head;
+    /*struct list *temp=head;
     //printk(KERN_CONT "IN UNLOCK\n");
     while(temp!=NULL)
     {
-        //printk(KERN_CONT "The offsets are %lu %lu\n",temp->offset,user_cmd->offset/PAGE_SIZE);
+       // printk(KERN_CONT "The offsets are %lu %lu\n",temp->offset,user_cmd->offset/PAGE_SIZE);
         if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {//printk(KERN_CONT "IN IF\n");
             mutex_unlock(&global_lock);
@@ -100,23 +103,28 @@ long npheap_unlock(struct npheap_cmd __user *user_cmd)
             return 0;
         }
         temp=temp->next;
-    }
+    }*/
+    mutex_unlock(&global_lock);
     return 0;
 }
 
 long npheap_getsize(struct npheap_cmd __user *user_cmd)
-{
+{ 
+     //printk(KERN_CONT "IN GETSIZE \n");
 	struct list *temp=head;
 	//check if the object exists
     while(temp!=NULL)
-    {
+    {//printk(KERN_CONT "IN GETSIZE while \n");
         if(temp->offset==(user_cmd->offset/PAGE_SIZE))
-        {
+        {//printk(KERN_CONT "IN GETSIZE before return \n");
 		//return the size of the object
 		return temp->size;
 	}
+   //printk(KERN_CONT "IN GETSIZE after return \n");
 	temp=temp->next;
+    //printk(KERN_CONT "IN GETSIZE final \n");
      }
+    // printk(KERN_CONT "IN GETSIZE quit \n");
    return 0;
 }
 
@@ -128,13 +136,13 @@ long npheap_delete(struct npheap_cmd __user *user_cmd)
     {
         if(temp->offset==(user_cmd->offset/PAGE_SIZE))
         {
-          //   printk(KERN_CONT "inside delete %lu\n",temp->offset);
+            // printk(KERN_CONT "inside delete %lu\n",temp->offset);
             
             //free the kernel memory
                 kfree(temp->addr);
                 //temp->addr=NULL;
                 //temp->offset=-1;
-               // printk(KERN_CONT "OBJECT DELETED\n");
+               printk(KERN_CONT "OBJECT DELETED\n");
                 return 0;
             
         }

@@ -18,7 +18,7 @@
 #define NO_WRITE_LOCK_UNLOCK_GETSIZE 7
 #define NO_WRITE_LOCK_UNLOCK_DELETE_GETSIZE 8
 
-//#define DEBUG 1
+#define DEBUG 1
 
 int main(int argc, char *argv[])
 {
@@ -115,7 +115,13 @@ int main(int argc, char *argv[])
         for(i = 0; i < number_of_objects; i++)
         {
             npheap_lock(devfd,i);
+#ifdef DEBUG
+        printf("DEBUG: This is before getsize the alloc for feature combination 3, 4, 5.\n");
+   #endif
             size = npheap_getsize(devfd,i);
+            #ifdef DEBUG
+        printf("DEBUG: This is after getsize in the alloc for feature combination 3, 4, 5.\n");
+   #endif
             while(size ==0 || size <= 10)
             {
                 size = rand() % max_size_of_objects;

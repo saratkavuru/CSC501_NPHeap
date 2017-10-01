@@ -63,12 +63,15 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
 	//check if the offset exists
    	while(temp!=NULL)
     	{
-           // printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff, temp->offset);
+            //printk(KERN_CONT "mmap in %lu %lu\n",vma->vm_pgoff, temp->offset);
             // printk(KERN_CONT "hi %lu \n",temp->offset);
         	if(temp->offset==(vma->vm_pgoff))
         	{   //printk(KERN_CONT "offset found\n");
                 if(!remap_pfn_range(vma,vma->vm_start,virt_to_phys(temp->addr)>>PAGE_SHIFT,vma->vm_end-vma->vm_start, vma->vm_page_prot))
-           //printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",temp->addr,virt_to_phys(temp->addr)>>PAGE_SHIFT); 
+                {
+
+                }
+         // printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",temp->addr,virt_to_phys(temp->addr)>>PAGE_SHIFT); 
            		 return 0;
         	}
 
@@ -76,14 +79,20 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
         
     	}
 //if the offset is not present allocate kernel memory
-       // printk(KERN_CONT "line 72\n");
+        printk(KERN_CONT "line 72\n");
 	void* kernel_memory = kmalloc(vma->vm_end - vma->vm_start, GFP_KERNEL);
         //printk(KERN_CONT "line 73\n");
         phys_addr_t kernel_phys_addr = __pa(kernel_memory);
     	//if(!remap_pfn_range(vma,vma->vm_start,kernel_phys_addr >> PAGE_SHIFT,vma->vm_end-vma->vm_start, vma->vm_page_prot))
       // if(!remap_pfn_range(vma,vma->vm_start,virt_to_phys(kernel_memory),vma->vm_end-vma->vm_start, vma->vm_page_prot))
         if(!remap_pfn_range(vma,vma->vm_start,virt_to_phys(kernel_memory)>> PAGE_SHIFT,vma->vm_end-vma->vm_start, vma->vm_page_prot))
-           printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,virt_to_phys(kernel_memory)>> PAGE_SHIFT);
+           {
+            printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,virt_to_phys(kernel_memory)>> PAGE_SHIFT);
+           if(!copy_from_user(kernel_memory,vma->vm_start,vma->vm_end-vma->vm_start))
+    {
+        printk(KERN_CONT "Data Copied\n");
+    }
+           }
 		//printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,kernel_phys_addr >> PAGE_SHIFT);
 	struct list *new_mapping=kmalloc(sizeof(struct list),GFP_KERNEL);
         new_mapping->addr=kernel_memory;

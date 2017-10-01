@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     {
         npheap_lock(devfd,i);
         size = npheap_getsize(devfd,i);
+     
         while(size ==0 || size <= 10)
         {
             size = rand() % max_size_of_objects;
