@@ -140,9 +140,10 @@ long npheap_delete(struct npheap_cmd __user *user_cmd)
             
             //free the kernel memory
                 kfree(temp->addr);
-                //temp->addr=NULL;
+                temp->addr=NULL;
+                temp->size = 0;
                 //temp->offset=-1;
-               printk(KERN_CONT "OBJECT DELETED\n");
+               printk(KERN_CONT "OBJECT DELETED %lu\n",temp->offset);
                 return 0;
             
         }

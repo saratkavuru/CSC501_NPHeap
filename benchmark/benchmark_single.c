@@ -18,7 +18,7 @@
 #define NO_WRITE_LOCK_UNLOCK_GETSIZE 7
 #define NO_WRITE_LOCK_UNLOCK_DELETE_GETSIZE 8
 
-#define DEBUG 1
+//#define DEBUG 1
 
 int main(int argc, char *argv[])
 {

@@ -59,6 +59,7 @@ struct list *head=NULL;
 int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
 {
     	struct list *temp=head;
+        int flag=0;
     //printk(KERN_CONT "hi %lu %lu\n",vma->vm_pgoff>>PAGE_SHIFT, temp->offset);
 	//check if the offset exists
    	while(temp!=NULL)
@@ -67,20 +68,29 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
             // printk(KERN_CONT "hi %lu \n",temp->offset);
         	if(temp->offset==(vma->vm_pgoff))
         	{   //printk(KERN_CONT "offset found\n");
-                if(!remap_pfn_range(vma,vma->vm_start,virt_to_phys(temp->addr)>>PAGE_SHIFT,vma->vm_end-vma->vm_start, vma->vm_page_prot))
-                {
-
-                }
+                if(temp->addr!=NULL)
+                   { if(!remap_pfn_range(vma,vma->vm_start,virt_to_phys(temp->addr)>>PAGE_SHIFT,vma->vm_end-vma->vm_start, vma->vm_page_prot))
+                    {
+                         //printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,virt_to_phys(kernel_memory)>> PAGE_SHIFT);
+           if(!copy_from_user(temp->addr,vma->vm_start,vma->vm_end-vma->vm_start))
+    {
+        printk(KERN_CONT "Data Copied\n");
+    }
+                    }
          // printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",temp->addr,virt_to_phys(temp->addr)>>PAGE_SHIFT); 
-           		 return 0;
+           		 return 0;}
+                 else{
+                    flag=1;
+                 }
         	}
-
+            if(flag==1)
+                break;
          temp=temp->next;
         
     	}
 //if the offset is not present allocate kernel memory
         printk(KERN_CONT "line 72\n");
-	void* kernel_memory = kmalloc(vma->vm_end - vma->vm_start, GFP_KERNEL);
+	void* kernel_memory = kzalloc(vma->vm_end - vma->vm_start, GFP_KERNEL);
         //printk(KERN_CONT "line 73\n");
         phys_addr_t kernel_phys_addr = __pa(kernel_memory);
     	//if(!remap_pfn_range(vma,vma->vm_start,kernel_phys_addr >> PAGE_SHIFT,vma->vm_end-vma->vm_start, vma->vm_page_prot))
@@ -101,14 +111,20 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
 	//mutex_unlock(&new_mapping->lock);
        	new_mapping->next=NULL;
         temp = head;
-    	if(temp==NULL)
+        if(flag==1)
+        {
+            temp->addr=kernel_memory;
+            temp->size=vma->vm_end - vma->vm_start;
+        }
+        else
+    	{if(temp==NULL)
    	     head=new_mapping;
     	else
         {
     		while(temp->next!=NULL)
         	temp=temp->next;
         	temp->next=new_mapping;
-        }
+        }}
     return 0;
 }
 
