@@ -74,7 +74,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
                          //printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,virt_to_phys(kernel_memory)>> PAGE_SHIFT);
            if(!copy_from_user(temp->addr,vma->vm_start,vma->vm_end-vma->vm_start))
     {
-        printk(KERN_CONT "Data Copied\n");
+        //printk(KERN_CONT "Data Copied\n");
     }
                     }
          // printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",temp->addr,virt_to_phys(temp->addr)>>PAGE_SHIFT); 
@@ -100,7 +100,7 @@ int npheap_mmap(struct file *filp, struct vm_area_struct *vma)
             printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,virt_to_phys(kernel_memory)>> PAGE_SHIFT);
            if(!copy_from_user(kernel_memory,vma->vm_start,vma->vm_end-vma->vm_start))
     {
-        printk(KERN_CONT "Data Copied\n");
+        //printk(KERN_CONT "Data Copied\n");
     }
            }
 		//printk(KERN_CONT "successfuly allocated kernel memory %lu at %lu \n",kernel_memory,kernel_phys_addr >> PAGE_SHIFT);
